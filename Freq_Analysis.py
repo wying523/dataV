@@ -60,5 +60,3 @@ plt.savefig('frequency_Analysis.png',bbox_inches='tight')
 
 
 ##test git
-#ahfhadfaiu
-
