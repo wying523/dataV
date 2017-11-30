@@ -58,5 +58,7 @@ ax1.text(1.1,400000, ' Total number of samples = %d\n Mean Value = %.3f\n Standa
 
 plt.savefig('frequency_Analysis.png',bbox_inches='tight')
 
+# start EWMA Filter
 
-##test git
+
+
