@@ -2,32 +2,41 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-# one could use np.loadtxt and it returns an array however the computational time
-# is much slower than pd.read_csv.
-Temperature = pd.read_csv('Temperature.txt')
 
-ratio= pd.read_csv('rnoxdiffavrgmaxus.txt')
-
-Height = pd.read_csv('height.txt')
+ratio= pd.read_csv('Processed_Ratio.csv',index_col=0)
 
 
-Length = len(Height)
 
-RatioMean = ratio.mean().values
-ratio_std = np.std(ratio.values)
+Length = len(ratio)
+
+RatioMean = ratio.mean()
+ratio_std = np.std(ratio.values[:,0])
 
 #EWMA coefficient
-Alpha = 0.5
+Alpha = np.arange(0,1,0.01)
+Alpha =pd.DataFrame(Alpha)
 
 #initialize the filtered data frame
-S = pd.DataFrame(index = range(0,Length-1),columns = [1])
+std_arr = pd.DataFrame(index = range(len(Alpha)),columns = [0])
 
+for j in xrange(len(Alpha)):
+    S = pd.DataFrame(index = range(len(ratio)),columns = [0])
+    
+    temp = ratio.values[0][0]
+    S.values[0][0] = temp
+    
+    Alp = Alpha.values[j][0]
+    
+    for i in xrange(1,Length):
+        
+        S.values[i][0] =(1-Alp) *S.values[i-1][0] + Alp * ratio.values[i][0]
+         
 
-temp = ratio.values[0][0]
-S.at[0,1] = temp
+    std_arr.values[j][0] = np.std(S[0])
 
-for i in xrange(1,Length):
-    S.at[i,1] = (1-Alpha) * S.values[i-1,0] + Alpha * ratio.values[i,0]
+ 
+SAVE = pd.concat([Alpha, std_arr], axis=1)
+SAVE.to_csv("STD.csv")
 
-New_std = np.std(S.values)
-S.to_csv('Alpha50perce')
+perc_reduction = 1-std_arr.values[:,0]/ratio_std
+plt.plot(Alpha,perc_reduction)
